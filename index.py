@@ -7,31 +7,42 @@ class Game:
   MAX = 100
   count = 0
 
-  GUESS = 0
+  SYSTEM_GUESS = 0
 
   def start_game(self):
     print "starting game"
-    self.GUESS = randint(self.MIN, self.MAX)
-    print self.GUESS
+    self.init()
+    self.SYSTEM_GUESS = randint(self.MIN, self.MAX)
+    print self.SYSTEM_GUESS
     self.roll()
-  
+
+  def init(self):
+    self.MIN = 0
+    self.MAX = 100
+    self.count = 0
+
   def roll(self):
     guess = raw_input(self.get_statement())
     guess = self.parse_input(guess)
-    if int(guess) == self.GUESS:
-      print "You guessed it right!"
-      print 'It only took you {0} guesses'.format(self.count)
-      self.update_best_round(self.count)
-      self.ask_again()
+    if int(guess) == self.SYSTEM_GUESS:
+      self.process_correct_guess()
     else:
-      if (int(guess) > self.GUESS):
-        print 'Too high'
-        self.MAX = int(guess) - 1
-      else:
-        print 'Too low'
-        self.MIN = int(guess) + 1
-      self.roll()
-    
+      self.process_incorrect_guess(guess)
+
+  def process_correct_guess(self):
+    print "You guessed it right!"
+    print 'It only took you {0} guesses'.format(self.count)
+    self.update_best_round(self.count)
+    self.ask_again()
+
+  def process_incorrect_guess(self, guess):
+    if (int(guess) > self.SYSTEM_GUESS):
+      print 'Too high'
+      self.MAX = int(guess) - 1
+    else:
+      print 'Too low'
+      self.MIN = int(guess) + 1
+    self.roll()
 
   def get_statement(self):
     return 'Enter a number between {0} and {1} - '.format(self.MIN, self.MAX)
@@ -53,7 +64,7 @@ class Game:
     if input.lower() == 'n':
       self.print_best_attempt_and_exit()
     self.ask_again()
-  
+
   def update_best_round(self, attempts):
     global MIN_ATTEMPTS
     if MIN_ATTEMPTS == 0 or attempts < MIN_ATTEMPTS:
